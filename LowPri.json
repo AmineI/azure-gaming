@@ -214,6 +214,28 @@
                     "extensionProfile": {
                         "extensions": [
                         {
+                          "name": "microsoft.nvidia-gpu-driver-windows",
+                          "apiVersion": "2015-01-01",
+                          "type": "Microsoft.Resources/deployments",
+                          "properties": {
+                              "mode": "incremental",
+                              "templateLink": {
+                                  "uri": "https://gallery.azure.com/artifact/20161101/microsoft.nvidia-gpu-driver-windows-arm.1.1.0/Artifacts/MainTemplate.json"
+                              },
+                              "parameters": {
+                                  "vmName": {
+                                      "value": "[variables('vmssName')]"
+                                  },
+                                  "location": {
+                                      "value": "[resourceGroup().location]"
+                                  }
+                              }
+                          },
+                          "dependsOn": [
+                              "[concat('Microsoft.Compute/virtualMachines/', variables('vmssName'))]"
+                          ]
+                      },
+                      {
                             "name": "Setup",
                             "properties": {
                                 "publisher": "Microsoft.Compute",
@@ -226,7 +248,12 @@
                                     ],
                                     "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', variables('scriptFolder'), '/', variables('scriptFileName'), ' ', variables('scriptParameters'))]"
                                 }
-                            }
+                            },
+                            
+                          "dependsOn": [
+                            "[variables('vmssName')]",
+                            "microsoft.nvidia-gpu-driver-windows"
+                        ]
                         }]
                     }
                 }
